@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tables } from "@/types/database.types";
 import useFetchStorage from "@/hooks/supabase/useFetchStorage";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 
 export const columns: ColumnDef<Tables<"campaigns">>[] = [
   {
@@ -34,6 +35,36 @@ export const columns: ColumnDef<Tables<"campaigns">>[] = [
   {
     accessorKey: "description",
     header: "Description",
+  },
+  {
+    accessorKey: "amount",
+    header: "Total Amount",
+  },
+  {
+    accessorKey: "reserved_amount",
+    header: "Reserved Amount",
+  },
+  {
+    accessorKey: "pay_per_view",
+    header: "Pay Per View",
+  },
+  {
+    accessorKey: "start_date",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Start Date" />
+    ),
+    cell: ({ getValue }) => {
+      return new Date(getValue() as string).toLocaleString();
+    },
+  },
+  {
+    accessorKey: "end_date",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="End Date" />
+    ),
+    cell: ({ getValue }) => {
+      return new Date(getValue() as string).toLocaleString();
+    },
   },
   {
     accessorKey: "is_draft",

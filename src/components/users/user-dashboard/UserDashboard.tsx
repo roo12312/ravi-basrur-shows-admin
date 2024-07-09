@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 
 import { PaymentTransactionsList } from "../payment-transaction-list/client";
 import { ViewingHistoryList } from "../viewing-history-list/client";
+import { PayoutTransactionList } from "../payout-transaction-list/client";
 
 export default function UserDashboard({ userId }: { userId: string }) {
   const {
@@ -39,6 +40,7 @@ export default function UserDashboard({ userId }: { userId: string }) {
         <TabsList>
           <TabsTrigger value="account">Payment Transactions</TabsTrigger>
           <TabsTrigger value="password">Viewing History</TabsTrigger>
+          <TabsTrigger value="payout">Payout History</TabsTrigger>
         </TabsList>
         <Separator className="mt-3" />
         <TabsContent value="account">
@@ -46,6 +48,9 @@ export default function UserDashboard({ userId }: { userId: string }) {
         </TabsContent>
         <TabsContent value="password">
           <ViewingHistoryList user_id={userId} />{" "}
+        </TabsContent>
+        <TabsContent value="payout">
+          <PayoutTransactionList user_id={userId} />
         </TabsContent>
       </Tabs>
     </div>

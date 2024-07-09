@@ -21,6 +21,7 @@ import { ViewingHistoryList } from "@/components/users/viewing-history-list/clie
 import { toast } from "sonner";
 import { CreateEditCampaign } from "./CreateEditCampaign";
 import { CreateEditCampaignAd } from "./CreateEditCampaignAd";
+import { PayoutTransactionList } from "@/components/users/payout-transaction-list/client";
 
 export default function DisplayCampaign({ id }: { id: string }) {
   const [editCampaign, setEditCampaign] = useState(false);
@@ -217,6 +218,14 @@ export default function DisplayCampaign({ id }: { id: string }) {
                   refetch();
                 }}
               />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger className="text-xl font-bold">
+              Payout Histroy
+            </AccordionTrigger>
+            <AccordionContent>
+              <PayoutTransactionList campaign_id={campaign?.id} />
             </AccordionContent>
           </AccordionItem>
           {/* <AccordionItem value="item-3">

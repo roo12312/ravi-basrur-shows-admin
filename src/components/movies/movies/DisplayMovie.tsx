@@ -20,6 +20,7 @@ import useDeleteSingleFile from "../../../hooks/supabase/useDeleteSingleFile";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ViewingHistoryList } from "@/components/users/viewing-history-list/client";
 import { toast } from "sonner";
+import { PayoutTransactionList } from "@/components/users/payout-transaction-list/client";
 
 function combineCastInformation(data) {
   const roleMap = {};
@@ -467,6 +468,14 @@ export default function DisplayMovie({ id }: { id: string }) {
             </AccordionTrigger>
             <AccordionContent>
               <ViewingHistoryList movie_id={movieInfo?.id} />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-6">
+            <AccordionTrigger className="text-xl font-bold">
+              Payout Histroy
+            </AccordionTrigger>
+            <AccordionContent>
+              <PayoutTransactionList movie_id={movieInfo?.id} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
