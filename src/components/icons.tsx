@@ -38,6 +38,7 @@ import {
   X,
   Bell,
   IndianRupee,
+  TicketIcon,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -78,6 +79,7 @@ export const Icons = {
   "panel-bottom-dashed": PanelBottom,
   bell: Bell,
   "indian-rupee": IndianRupee,
+  ticket: TicketIcon,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

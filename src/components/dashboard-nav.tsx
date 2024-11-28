@@ -102,6 +102,12 @@ const NAV_ITEMS: NavItem[] = [
     label: "Home Page Slider",
   },
   {
+    title: "Coupons",
+    href: "/dashboard/coupons",
+    icon: "ticket",
+    label: "Coupons",
+  },
+  {
     title: "Push Notifications",
     href: "/dashboard/push-notifications",
     icon: "bell",

@@ -48,7 +48,13 @@ export const columns: ColumnDef<Tables<"payout_transactions">>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 
@@ -58,7 +64,13 @@ export const columns: ColumnDef<Tables<"payout_transactions">>[] = [
       <DataTableColumnHeader column={column} title="Updated At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 
@@ -84,6 +96,16 @@ export const columns: ColumnDef<Tables<"payout_transactions">>[] = [
 
       return <Badge variant={variant}>{getValue()}</Badge>;
     },
+  },
+  {
+    accessorKey: "http_response",
+    // accessorFn: (row) => row.movies.title,
+    header: "Http Response",
+    cell: ({ getValue }) => {
+      return JSON.stringify(getValue());
+    },
+    enableResizing: true,
+    size: 300,
   },
   {
     accessorKey: "all_ads_watched",

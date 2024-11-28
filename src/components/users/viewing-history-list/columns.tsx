@@ -63,7 +63,13 @@ export const columns: ColumnDef<Tables<"viewing_history">>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue()).toLocaleString();
+      return new Date(getValue()).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 
@@ -74,7 +80,13 @@ export const columns: ColumnDef<Tables<"viewing_history">>[] = [
       <DataTableColumnHeader column={column} title="Updated At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue()).toLocaleString();
+      return new Date(getValue()).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 

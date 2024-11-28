@@ -48,7 +48,13 @@ export const columns: ColumnDef<Tables<"payment_transactions">>[] = [
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 
@@ -58,7 +64,13 @@ export const columns: ColumnDef<Tables<"payment_transactions">>[] = [
       <DataTableColumnHeader column={column} title="Updated At" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
 

@@ -17,26 +17,34 @@ import { Tables } from "@/types/database.types";
 
 interface ProductsClientProps {}
 
-const filterFields: DataTableFilterField<Tables<"ads">>[] = [
+const filterFields: DataTableFilterField<Tables<"coupons">>[] = [
   {
-    label: "Name",
-    value: "name",
-    placeholder: "Filter tags",
+    label: "coupon",
+    value: "coupon",
+    placeholder: "Filter coupon",
+  },
+  {
+    label: "Draft",
+    value: "is_draft",
+    options: ["true", "false"].map((status) => ({
+      label: status,
+      value: status,
+    })),
   },
 ];
 
-export const Ads: React.FC<ProductsClientProps> = ({}) => {
+export const Coupons: React.FC<ProductsClientProps> = ({}) => {
   const router = useRouter();
   const pathName = usePathname();
 
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading title={`Ads`} description="Manage ads" />
+        <Heading title={`Coupons`} description="Manage coupons" />
         <Button
           className="text-xs md:text-sm"
           onClick={() => {
-            router.push(pathName + "?new_ad=true");
+            router.push(pathName + "?new_coupon=true");
           }}
         >
           <Plus className="mr-2 h-4 w-4" /> Add New
@@ -47,7 +55,7 @@ export const Ads: React.FC<ProductsClientProps> = ({}) => {
       <DataTable
         filterFields={filterFields}
         columns={columns}
-        tableName="ads"
+        tableName="coupons"
       />
     </>
   );

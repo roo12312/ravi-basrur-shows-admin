@@ -60,6 +60,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      bank_account_details: {
+        Row: {
+          account_ifsc: string | null;
+          account_name: string | null;
+          account_number: string | null;
+          created_at: string;
+          id: string;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          account_ifsc?: string | null;
+          account_name?: string | null;
+          account_number?: string | null;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          account_ifsc?: string | null;
+          account_name?: string | null;
+          account_number?: string | null;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bank_account_details_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       campaign_ads: {
         Row: {
           ad_id: string;
@@ -130,7 +168,7 @@ export type Database = {
           movie_id: string;
           name: string;
           pay_per_view: number;
-          reserved_amount: number;
+          reserved_amount?: number;
           start_date: string;
           updated_at?: string;
         };
@@ -332,6 +370,48 @@ export type Database = {
           }
         ];
       };
+      coupons: {
+        Row: {
+          applicable_for: string[];
+          coupon: string;
+          coupon_amount: number | null;
+          coupon_max_discount: number | null;
+          coupon_percentage: number | null;
+          created_at: string;
+          id: string;
+          is_draft: boolean;
+          max_uses: number;
+          updated_at: string;
+          valid_until: string;
+        };
+        Insert: {
+          applicable_for?: string[];
+          coupon: string;
+          coupon_amount?: number | null;
+          coupon_max_discount?: number | null;
+          coupon_percentage?: number | null;
+          created_at?: string;
+          id?: string;
+          is_draft?: boolean;
+          max_uses?: number;
+          updated_at?: string;
+          valid_until: string;
+        };
+        Update: {
+          applicable_for?: string[];
+          coupon?: string;
+          coupon_amount?: number | null;
+          coupon_max_discount?: number | null;
+          coupon_percentage?: number | null;
+          created_at?: string;
+          id?: string;
+          is_draft?: boolean;
+          max_uses?: number;
+          updated_at?: string;
+          valid_until?: string;
+        };
+        Relationships: [];
+      };
       episodes: {
         Row: {
           created_at: string;
@@ -373,6 +453,62 @@ export type Database = {
           }
         ];
       };
+      feedback: {
+        Row: {
+          created_at: string;
+          id: string;
+          movie_id: string | null;
+          profile_id: string;
+          rating: number;
+          session_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          movie_id?: string | null;
+          profile_id?: string;
+          rating: number;
+          session_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          movie_id?: string | null;
+          profile_id?: string;
+          rating?: number;
+          session_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feedback_movie_id_fkey";
+            columns: ["movie_id"];
+            isOneToOne: false;
+            referencedRelation: "movies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_movie_id_fkey";
+            columns: ["movie_id"];
+            isOneToOne: false;
+            referencedRelation: "movies_details";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "viewing_history";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       genres: {
         Row: {
           created_at: string;
@@ -398,6 +534,7 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          is_draft: boolean;
           movies_id: string | null;
           tv_shows_id: string | null;
           updated_at: string;
@@ -405,6 +542,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           id?: string;
+          is_draft?: boolean;
           movies_id?: string | null;
           tv_shows_id?: string | null;
           updated_at?: string;
@@ -412,6 +550,7 @@ export type Database = {
         Update: {
           created_at?: string;
           id?: string;
+          is_draft?: boolean;
           movies_id?: string | null;
           tv_shows_id?: string | null;
           updated_at?: string;
@@ -981,10 +1120,13 @@ export type Database = {
       };
       payout_transactions: {
         Row: {
+          all_ads_watched: boolean;
           amount: number;
+          campaign_id: string | null;
           created_at: string | null;
-          extra_data: Json | null;
+          http_response: Json | null;
           id: string;
+          is_flagged: boolean;
           movie_id: string;
           qualified: boolean | null;
           session_id: string;
@@ -993,10 +1135,13 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          all_ads_watched?: boolean;
           amount: number;
+          campaign_id?: string | null;
           created_at?: string | null;
-          extra_data?: Json | null;
+          http_response?: Json | null;
           id?: string;
+          is_flagged?: boolean;
           movie_id: string;
           qualified?: boolean | null;
           session_id: string;
@@ -1005,10 +1150,13 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          all_ads_watched?: boolean;
           amount?: number;
+          campaign_id?: string | null;
           created_at?: string | null;
-          extra_data?: Json | null;
+          http_response?: Json | null;
           id?: string;
+          is_flagged?: boolean;
           movie_id?: string;
           qualified?: boolean | null;
           session_id?: string;
@@ -1017,6 +1165,13 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "payout_transactions_campaign_id_fkey";
+            columns: ["campaign_id"];
+            isOneToOne: false;
+            referencedRelation: "campaigns";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "payout_transactions_movie_id_fkey";
             columns: ["movie_id"];
@@ -1104,6 +1259,7 @@ export type Database = {
           success_count: number | null;
           title: string | null;
           ttl: string | null;
+          updated_at: string;
         };
         Insert: {
           body?: string | null;
@@ -1114,6 +1270,7 @@ export type Database = {
           success_count?: number | null;
           title?: string | null;
           ttl?: string | null;
+          updated_at?: string;
         };
         Update: {
           body?: string | null;
@@ -1124,6 +1281,7 @@ export type Database = {
           success_count?: number | null;
           title?: string | null;
           ttl?: string | null;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -1346,6 +1504,7 @@ export type Database = {
           campaign_id: string;
           created_at: string;
           id: string;
+          is_link_clicked: boolean;
           is_watched: boolean;
           session_id: string;
           updated_at: string;
@@ -1356,6 +1515,7 @@ export type Database = {
           campaign_id: string;
           created_at?: string;
           id?: string;
+          is_link_clicked?: boolean;
           is_watched?: boolean;
           session_id: string;
           updated_at?: string;
@@ -1366,6 +1526,7 @@ export type Database = {
           campaign_id?: string;
           created_at?: string;
           id?: string;
+          is_link_clicked?: boolean;
           is_watched?: boolean;
           session_id?: string;
           updated_at?: string;
@@ -1523,6 +1684,7 @@ export type Database = {
         Row: {
           completed: boolean;
           content: Json;
+          content_access_id: string | null;
           created_at: string;
           current_time: number;
           device_info: Json | null;
@@ -1539,6 +1701,7 @@ export type Database = {
         Insert: {
           completed?: boolean;
           content: Json;
+          content_access_id?: string | null;
           created_at?: string;
           current_time?: number;
           device_info?: Json | null;
@@ -1555,6 +1718,7 @@ export type Database = {
         Update: {
           completed?: boolean;
           content?: Json;
+          content_access_id?: string | null;
           created_at?: string;
           current_time?: number;
           device_info?: Json | null;
@@ -1569,6 +1733,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "viewing_history_content_access_id_fkey";
+            columns: ["content_access_id"];
+            isOneToOne: false;
+            referencedRelation: "content_access";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "viewing_history_movie_id_fkey";
             columns: ["movie_id"];
@@ -1602,6 +1773,7 @@ export type Database = {
       viewing_history_logs: {
         Row: {
           completed: boolean;
+          content_access_id: string | null;
           created_at: string;
           current_time: number;
           device_info: Json | null;
@@ -1618,6 +1790,7 @@ export type Database = {
         };
         Insert: {
           completed?: boolean;
+          content_access_id?: string | null;
           created_at: string;
           current_time?: number;
           device_info?: Json | null;
@@ -1634,6 +1807,7 @@ export type Database = {
         };
         Update: {
           completed?: boolean;
+          content_access_id?: string | null;
           created_at?: string;
           current_time?: number;
           device_info?: Json | null;
@@ -2087,6 +2261,21 @@ export type Database = {
         };
         Returns: unknown;
       };
+      get_current_time: {
+        Args: {
+          p_profile_id: string;
+          p_movie_id: string;
+          p_content_access_id: string;
+          p_asset_id: string;
+        };
+        Returns: number;
+      };
+      update_payout_status: {
+        Args: {
+          session_id_prop: string;
+        };
+        Returns: boolean;
+      };
     };
     Enums: {
       payment_status:
@@ -2095,7 +2284,13 @@ export type Database = {
         | "success"
         | "failed"
         | "refunded";
-      payout_status: "initial" | "not qualified" | "processing" | "processed";
+      payout_status:
+        | "initial"
+        | "not qualified"
+        | "processing"
+        | "processed"
+        | "success"
+        | "failed";
       player_events:
         | "pause"
         | "play"
@@ -2107,7 +2302,8 @@ export type Database = {
         | "initial"
         | "back"
         | "ad_shown"
-        | "ad_closed";
+        | "ad_closed"
+        | "ad_link_clicked";
       watching_options: "rental" | "paid" | "free";
     };
     CompositeTypes: {

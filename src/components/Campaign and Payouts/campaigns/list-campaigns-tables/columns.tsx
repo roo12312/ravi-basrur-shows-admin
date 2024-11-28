@@ -54,7 +54,13 @@ export const columns: ColumnDef<Tables<"campaigns">>[] = [
       <DataTableColumnHeader column={column} title="Start Date" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
   {
@@ -63,7 +69,13 @@ export const columns: ColumnDef<Tables<"campaigns">>[] = [
       <DataTableColumnHeader column={column} title="End Date" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleString();
+      return new Date(getValue() as string).toLocaleTimeString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
   },
   {

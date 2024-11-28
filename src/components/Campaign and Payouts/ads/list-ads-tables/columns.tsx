@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tables } from "@/types/database.types";
 import useFetchStorage from "@/hooks/supabase/useFetchStorage";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 
 export const columns: ColumnDef<Tables<"ads">>[] = [
   {
