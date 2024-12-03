@@ -24,9 +24,12 @@ export default async function DashboardLayout({
   return (
     <>
       <Header />
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex flex-row h-screen  w-screen">
         <Sidebar />
-        <main className="w-full pt-16 ">{children}</main>
+
+        <main className="w-full pt-16 flex-grow  overflow-hidden">
+          {children}
+        </main>
       </div>
     </>
   );

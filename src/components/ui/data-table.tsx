@@ -192,7 +192,7 @@ export function DataTable<TData, TValue>({
   console.log("value", table.getFilteredSelectedRowModel()); */
 
   return (
-    <>
+    <div className="flex-1">
       <div className="flex items-center ">
         {advancedFilter ? (
           <DataTableAdvancedToolbar table={table} filterFields={filterFields}>
@@ -272,6 +272,6 @@ export function DataTable<TData, TValue>({
       <div className="mt-5">
         <DataTablePagination table={table} />
       </div>
-    </>
+    </div>
   );
 }

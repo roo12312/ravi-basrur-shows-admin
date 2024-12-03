@@ -96,6 +96,18 @@ const NAV_ITEMS: NavItem[] = [
     label: "Users",
   },
   {
+    title: "Payments History",
+    href: "/dashboard/payments-history",
+    icon: "circle-dollar-sign",
+    label: "Payments History",
+  },
+  {
+    title: "Payouts History",
+    href: "/dashboard/payout-history",
+    icon: "circle-dollar-sign",
+    label: "Payout History",
+  },
+  {
     title: "Home Page Slider",
     href: "/dashboard/home-page-slider",
     icon: "panel-bottom-dashed",

@@ -42,16 +42,16 @@ export const columns: ColumnDef<Tables<"coupons">>[] = [
     header: "Amount",
     cell: ({ getValue }) => getValue() || "N/A",
   },
-  {
-    accessorKey: "coupon_percentage",
-    header: "Percentage",
-    cell: ({ getValue }) => (getValue() ? `${getValue()}%` : "N/A"),
-  },
-  {
-    accessorKey: "coupon_max_discount",
-    header: "Max Discount",
-    cell: ({ getValue }) => getValue() || "N/A",
-  },
+  // {
+  //   accessorKey: "coupon_percentage",
+  //   header: "Percentage",
+  //   cell: ({ getValue }) => (getValue() ? `${getValue()}%` : "N/A"),
+  // },
+  // {
+  //   accessorKey: "coupon_max_discount",
+  //   header: "Max Discount",
+  //   cell: ({ getValue }) => getValue() || "N/A",
+  // },
 
   {
     accessorKey: "valid_until",

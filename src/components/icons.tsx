@@ -39,6 +39,7 @@ import {
   Bell,
   IndianRupee,
   TicketIcon,
+  CircleDollarSign,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -80,6 +81,7 @@ export const Icons = {
   bell: Bell,
   "indian-rupee": IndianRupee,
   ticket: TicketIcon,
+  "circle-dollar-sign": CircleDollarSign,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

@@ -274,7 +274,7 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="coupon_percentage"
                   render={({ field }) => (
@@ -313,7 +313,7 @@ export function CreateEditCoupons({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name="valid_until"
