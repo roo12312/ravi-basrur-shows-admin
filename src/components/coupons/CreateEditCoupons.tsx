@@ -28,11 +28,12 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import useMutationData from "@/hooks/supabase/useMutationData";
 import useFetchData from "@/hooks/supabase/useFetchData";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { Textarea } from "../ui/textarea";
+import { AsyncSelect } from "@/components/ui/react-select";
 
-const applicableOptions = [
+const applicableCategories = [
   { value: "movies", label: "Movies" },
   { value: "documentaries", label: "Documentaries" },
   { value: "shows", label: "Shows" },
@@ -48,7 +49,15 @@ const formSchema = z.object({
   coupon_max_discount: z.number().optional(),
   valid_until: z.date({ required_error: "Expiration date is required" }),
   max_uses: z.number().positive("Must be at least 1"),
-  applicable_for: z.array(z.string()),
+  applicable_for: z.object({
+    categories: z.array(z.string()).default(["all"]),
+    include: z
+      .array(z.object({ value: z.string(), label: z.string() }))
+      .optional(),
+    exclude: z
+      .array(z.object({ value: z.string(), label: z.string() }))
+      .optional(),
+  }),
   is_draft: z.boolean().optional(),
 });
 
@@ -62,25 +71,70 @@ export function CreateEditCoupons({
   editCouponId?: string | null | undefined;
 }) {
   const defaultValues = {
-    coupon: undefined, // Coupon code (name)
-    description: undefined, // Coupon description
-    coupon_amount: undefined, // Coupon amount (ensure it's numeric)
+    coupon: undefined,
+    description: undefined,
+    coupon_amount: undefined,
     coupon_percentage: undefined,
     coupon_max_discount: undefined,
-    valid_until: undefined, // Valid until date (should be a string or empty)
-    is_draft: true, // Draft status (boolean)
-    max_uses: undefined, // Maximum uses for the coupon
-    applicable_for: undefined, // Applicable for field (e.g., 'electronics', 'fashion', etc.)
-    created_at: undefined, // Created at (date string or empty)
-    updated_at: undefined, // Updated at (date string or empty)
+    valid_until: undefined,
+    is_draft: true,
+    max_uses: undefined,
+    applicable_for: {
+      categories: ["all"],
+      include: [],
+      exclude: [],
+    },
   };
+
   const form = useForm<CouponType>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
 
+  const [isIncludeFilled, setIsIncludeFilled] = useState(false);
+  const [isExcludeFilled, setIsExcludeFilled] = useState(false);
+
+  // Watch applicable_for.include and applicable_for.exclude
+  const applicableForInclude = form.watch("applicable_for.include");
+  const applicableForExclude = form.watch("applicable_for.exclude");
+
+  console.log({ applicableForExclude });
+
+  // Use effect to monitor changes in applicable_for.include or exclude
+  useEffect(() => {
+    // Check if applicable_for.include has been filled
+    if (
+      applicableForInclude &&
+      applicableForInclude.length > 0 &&
+      !isIncludeFilled
+    ) {
+      setIsIncludeFilled(true);
+      form.setValue("applicable_for.exclude", []); // Clear exclude if include is filled
+    } else if (!applicableForInclude?.length && isIncludeFilled) {
+      setIsIncludeFilled(false);
+    }
+
+    // Check if applicable_for.exclude has been filled
+    if (
+      applicableForExclude &&
+      applicableForExclude.length > 0 &&
+      !isExcludeFilled
+    ) {
+      setIsExcludeFilled(true);
+      form.setValue("applicable_for.include", []); // Clear include if exclude is filled
+    } else if (!applicableForExclude?.length && isExcludeFilled) {
+      setIsExcludeFilled(false);
+    }
+  }, [
+    applicableForInclude,
+    applicableForExclude,
+    form,
+    isIncludeFilled,
+    isExcludeFilled,
+  ]);
+
   const edit = !!editCouponId;
-  const rotuer = useRouter();
+  const router = useRouter();
   const mutate = useMutationData();
 
   const generateRandomCoupon = () => {
@@ -90,10 +144,12 @@ export function CreateEditCoupons({
       .toUpperCase();
     form.setValue("coupon", randomCode);
   };
+
   const onClose = () => {
     form.reset(defaultValues);
-    rotuer.back();
+    router.back();
   };
+
   const onSubmit = async (data: CouponType) => {
     try {
       const rsp = await mutate.mutateAsync({
@@ -102,13 +158,19 @@ export function CreateEditCoupons({
           .insert({
             coupon: data.coupon,
             description: data.description,
-            coupon_amount: data.coupon_amount || null, // Handle optional fields
+            coupon_amount: data.coupon_amount || null,
             coupon_percentage: data.coupon_percentage || null,
             coupon_max_discount: data.coupon_max_discount || null,
-            valid_until: data.valid_until, // Already converted to Date
+            valid_until: data.valid_until,
             max_uses: data.max_uses,
             is_draft: data.is_draft,
-            applicable_for: data.applicable_for, // Array of applicable categories
+            applicable_for: {
+              ...data.applicable_for, // Spread the existing applicable_for data
+              include:
+                data.applicable_for.include?.map((item) => item.value) || [], // Map to extract ids, fallback to empty array
+              exclude:
+                data.applicable_for.exclude?.map((item) => item.value) || [], // Map to extract ids, fallback to empty array
+            },
           })
           .select(),
       });
@@ -136,59 +198,92 @@ export function CreateEditCoupons({
     },
   });
 
+  const { data: includedMovies, error: includedError } = useFetchData({
+    query: supabase
+      .from("movies")
+      .select("id, title")
+      .in("id", coupon?.data?.applicable_for?.include ?? []), // Fetch titles for the given IDs
+    options: {
+      enabled:
+        !!coupon?.data && coupon?.data?.applicable_for?.include?.length > 0,
+    },
+  });
+
+  // Fetch movie titles for the excluded movie IDs
+  const { data: excludedMovies, error: excludedError } = useFetchData({
+    query: supabase
+      .from("movies")
+      .select("id, title")
+      .in("id", coupon?.data?.applicable_for?.exclude ?? []), // Fetch titles for the given IDs
+    options: {
+      enabled:
+        !!coupon?.data && coupon?.data?.applicable_for?.exclude?.length > 0,
+    },
+  });
+
+  console.log({ includedMovies, excludedMovies });
   useEffect(() => {
     if (coupon.data) {
       form.reset({
-        coupon: coupon.data.coupon, // Coupon code (name)
-        description: coupon.data.description, // Coupon code (name)
-        coupon_amount: coupon.data.coupon_amount ?? undefined, // Coupon amount (ensure it's numeric if necessary)
+        coupon: coupon.data.coupon,
+        description: coupon.data.description,
+        coupon_amount: coupon.data.coupon_amount ?? undefined,
         coupon_max_discount: coupon.data.coupon_max_discount ?? undefined,
         coupon_percentage: coupon.data.coupon_percentage ?? undefined,
         valid_until: coupon.data.valid_until
           ? new Date(coupon.data.valid_until)
-          : "", // Formatting the date correctly
-        is_draft: coupon.data.is_draft, // Whether the coupon is in draft state
-        max_uses: coupon.data.max_uses, // max_uses field
-        applicable_for: coupon.data.applicable_for, // Applicable for field
-        created_at: coupon.data.created_at, // Created date (if needed)
-        updated_at: coupon.data.updated_at, // Last updated date (if needed)
-        // Add other fields if there are more columns in your coupon table
+          : "",
+        is_draft: coupon.data.is_draft,
+        max_uses: coupon.data.max_uses,
+        applicable_for: {
+          include:
+            includedMovies?.map((movie) => ({
+              value: movie.id,
+              label: movie.title,
+            })) ?? [],
+          exclude:
+            excludedMovies?.map((movie) => ({
+              value: movie.id,
+              label: movie.title,
+            })) ?? [],
+        },
       });
     } else {
-      form.reset(defaultValues); // Reset the form to default values if no coupon data
+      form.reset(defaultValues); // Reset to default values if no coupon data
     }
-  }, [coupon.data]);
+  }, [coupon.data, includedMovies, excludedMovies, form]);
 
   const onSubmitEdit = async (data: CouponType) => {
-    console.log(data);
-
     try {
-      if (!coupon.data) return; // Ensure we have the coupon data
+      if (!coupon.data) return;
 
-      // Prepare the data for update
       const rsp = await mutate.mutateAsync({
         query: supabase
           .from("coupons")
           .update({
             coupon: data.coupon,
             description: data.description,
-            coupon_amount: data.coupon_amount || null, // Handle optional fields
+            coupon_amount: data.coupon_amount || null,
             coupon_percentage: data.coupon_percentage || null,
             coupon_max_discount: data.coupon_max_discount || null,
-            valid_until: data.valid_until, // Already converted to Date
+            valid_until: data.valid_until,
             max_uses: data.max_uses,
             is_draft: data.is_draft,
-            applicable_for: data.applicable_for,
+            applicable_for: {
+              ...data.applicable_for,
+              include: data.applicable_for.include?.map((item) => item.value), // Extract only the `value` (id) from the include list
+              exclude: data.applicable_for.exclude?.map((item) => item.value), // Extract only the `value` (id) from the exclude list
+            },
           })
-          .match({ id: coupon.data.id }) // Match the coupon by its id
-          .select(), // Optionally select updated columns if needed
+          .match({ id: coupon.data.id })
+          .select(),
       });
 
       console.log(rsp);
 
       if (rsp.data) {
         toast("Coupon has been updated.");
-        onClose(); // Close modal or handle state
+        onClose();
       }
     } catch (err) {
       console.log("err coupon", err);
@@ -215,6 +310,7 @@ export function CreateEditCoupons({
                 onSubmit={form.handleSubmit(edit ? onSubmitEdit : onSubmit)}
                 className="space-y-4 w-full"
               >
+                {/* Coupon Code */}
                 <FormField
                   control={form.control}
                   name="coupon"
@@ -237,6 +333,8 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
+
+                {/* Description */}
                 <FormField
                   control={form.control}
                   name="description"
@@ -254,6 +352,7 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="coupon_amount"
@@ -348,6 +447,8 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
+
+                {/* Max Uses */}
                 <FormField
                   control={form.control}
                   name="max_uses"
@@ -368,19 +469,20 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
+                {/* Applicable Categories */}
                 <FormField
                   control={form.control}
-                  name="applicable_for"
+                  name="applicable_for.categories"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Applicable For</FormLabel>
+                      <FormLabel>Applicable For Categories</FormLabel>
                       <FormControl>
                         <Select
                           isMulti
-                          options={applicableOptions}
+                          options={applicableCategories}
                           className="basic-multi-select"
                           classNamePrefix="select"
-                          value={applicableOptions.filter((option) =>
+                          value={applicableCategories.filter((option) =>
                             field.value?.includes(option.value)
                           )}
                           onChange={(selected) =>
@@ -393,6 +495,134 @@ export function CreateEditCoupons({
                       <FormMessage />
                     </FormItem>
                   )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="applicable_for.include"
+                  render={({ field }) => {
+                    // Fetch movies asynchronously
+                    const { data: movies, isFetching } = useFetchData({
+                      query: supabase.from("movies").select("id, title"),
+                    });
+
+                    const initialOptions = useMemo(() => {
+                      if (!movies) {
+                        return [];
+                      }
+
+                      return movies.map((movie) => ({
+                        value: movie.id,
+                        label: movie.title,
+                      }));
+                    }, [movies]);
+
+                    const loadOptions = (inputValue: string) =>
+                      new Promise<{ value: string; label: string }[]>(
+                        async (resolve) => {
+                          if (!inputValue) resolve([]);
+
+                          const { data, error } = await supabase
+                            .from("movies")
+                            .select("id, title")
+                            .ilike("title", `%${inputValue}%`);
+
+                          if (error || !data) {
+                            resolve([]);
+                            return;
+                          }
+
+                          resolve(
+                            data.map((movie) => ({
+                              value: movie.id,
+                              label: movie.title,
+                            }))
+                          );
+                        }
+                      );
+
+                    return (
+                      <FormItem>
+                        <FormLabel>Include Movies</FormLabel>
+                        <FormControl>
+                          <AsyncSelect
+                            loadOptions={loadOptions}
+                            isDisabled={isExcludeFilled}
+                            defaultOptions={initialOptions}
+                            isMulti
+                            cacheOptions
+                            {...field}
+                            isLoading={isFetching}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="applicable_for.exclude"
+                  render={({ field }) => {
+                    // Fetch movies asynchronously
+                    const { data: movies, isFetching } = useFetchData({
+                      query: supabase.from("movies").select("id, title"),
+                    });
+
+                    const initialOptions = useMemo(() => {
+                      if (!movies) {
+                        return [];
+                      }
+
+                      return movies.map((movie) => ({
+                        value: movie.id,
+                        label: movie.title,
+                      }));
+                    }, [movies]);
+
+                    const loadOptions = (inputValue: string) =>
+                      new Promise<{ value: string; label: string }[]>(
+                        async (resolve) => {
+                          if (!inputValue) resolve([]);
+
+                          const { data, error } = await supabase
+                            .from("movies")
+                            .select("id, title")
+                            .ilike("title", `%${inputValue}%`);
+
+                          if (error || !data) {
+                            resolve([]);
+                            return;
+                          }
+
+                          resolve(
+                            data.map((movie) => ({
+                              value: movie.id,
+                              label: movie.title,
+                            }))
+                          );
+                        }
+                      );
+
+                    return (
+                      <FormItem>
+                        <FormLabel>Exclude Movies</FormLabel>
+                        <FormControl>
+                          <AsyncSelect
+                            loadOptions={loadOptions}
+                            defaultOptions={initialOptions}
+                            isDisabled={isIncludeFilled}
+                            isMulti
+                            cacheOptions
+                            {...field}
+                            isLoading={isFetching}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <FormField
                   control={form.control}
@@ -410,13 +640,11 @@ export function CreateEditCoupons({
                     </FormItem>
                   )}
                 />
-                <Button
-                  disabled={form.formState.isSubmitting}
-                  className="ml-auto w-full mt-5"
-                  type="submit"
-                >
-                  Save
-                </Button>
+                <DialogFooter>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {editCouponId ? "Update" : "Create"}
+                  </Button>
+                </DialogFooter>
               </form>
             </Form>
           )}

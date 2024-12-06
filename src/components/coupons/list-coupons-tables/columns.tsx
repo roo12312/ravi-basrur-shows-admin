@@ -8,6 +8,29 @@ import useFetchStorage from "@/hooks/supabase/useFetchStorage";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import useFetchData from "@/hooks/supabase/useFetchData";
+
+interface MovieTitleFetcherProps {
+  ids: string[]; // Array of movie IDs
+}
+
+const MovieTitleFetcher: React.FC<MovieTitleFetcherProps> = ({ ids }) => {
+  const { data, isLoading, error } = useFetchData({
+    query: supabase.from("movies").select("id, title").in("id", ids), // Fetch titles for the given IDs
+  });
+
+  if (isLoading) return <span>Loading...</span>;
+  if (error) return <span>Error: {error.message}</span>;
+
+  if (!data || data.length === 0) return <span> empty</span>;
+
+  // Join the movie titles into a string to display
+  const titles = data.map((movie: { title: string }) => movie.title).join(", ");
+
+  return <span> {titles}</span>;
+};
 
 export const columns: ColumnDef<Tables<"coupons">>[] = [
   {
@@ -94,8 +117,24 @@ export const columns: ColumnDef<Tables<"coupons">>[] = [
   {
     accessorKey: "applicable_for",
     header: "Applicable For",
-    cell: ({ getValue }) =>
-      Array.isArray(getValue()) ? getValue().join(", ") : "N/A",
+    cell: ({ getValue }) => {
+      const applicableFor = getValue();
+      if (!applicableFor) return "N/A";
+
+      return (
+        <div>
+          <strong>Category:</strong>
+          <span> {applicableFor.categories.join(", ")}</span>
+          <br />
+          <strong>Include:</strong>
+
+          <MovieTitleFetcher ids={applicableFor.include} />
+          <br />
+          <strong>Exclude:</strong>
+          <MovieTitleFetcher ids={applicableFor.exclude} />
+        </div>
+      );
+    },
   },
   {
     accessorKey: "created_at",
