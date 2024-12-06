@@ -34,16 +34,19 @@ import useFetchData from "@/hooks/supabase/useFetchData";
 import { useEffect, useMemo } from "react";
 
 import { AsyncSelect } from "../ui/react-select";
+import { title } from "process";
 
+// Update the schema to include `url` instead of JSON
 const formSchema = z.object({
   title: z.string(),
   body: z.string(),
+  url: z.string().optional(), // URL field
 });
 
 type CreatePushNotificationsType = z.infer<typeof formSchema>;
 
 export function CreatePushNotifications({ open = false }: { open: boolean }) {
-  const rotuer = useRouter();
+  const router = useRouter();
   const mutate = useMutationData();
   const defaultValues = {};
 
@@ -54,21 +57,28 @@ export function CreatePushNotifications({ open = false }: { open: boolean }) {
 
   const onClose = () => {
     form.reset(defaultValues);
-    rotuer.back();
+    router.back();
   };
 
   const onSubmit = async (data: CreatePushNotificationsType) => {
     console.log(data);
+
     try {
+      // Conditionally include the `data` field if URL exists
+      const payload = {
+        body: data.body,
+        title: data.title,
+        data: data.url ? { url: data.url } : undefined, // If URL exists, include it in the data field
+      };
+
       const rsp = await mutate.mutateAsync({
-        query: supabase.from("push_notifications").insert(data).select("*"),
+        query: supabase.from("push_notifications").insert(payload).select("*"),
       });
 
       console.log(rsp);
 
       if (rsp.data) {
         toast("Added Successfully.");
-
         onClose();
       }
     } catch (err) {
@@ -81,7 +91,6 @@ export function CreatePushNotifications({ open = false }: { open: boolean }) {
       <DialogContent className="sm:max-w-md" onClose={onClose}>
         <DialogHeader>
           <DialogTitle>{"Add Notification"}</DialogTitle>
-          {/* <DialogDescription>Add new tag to the list</DialogDescription> */}
         </DialogHeader>
         <div className="flex items-center space-x-2">
           <Form {...form}>
@@ -117,6 +126,24 @@ export function CreatePushNotifications({ open = false }: { open: boolean }) {
                       <Input
                         type="text"
                         placeholder="Type here..."
+                        disabled={form.formState.isSubmitting}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* URL field for data */}
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter a URL"
                         disabled={form.formState.isSubmitting}
                         {...field}
                       />
