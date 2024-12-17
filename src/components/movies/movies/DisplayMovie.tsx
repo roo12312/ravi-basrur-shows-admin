@@ -73,6 +73,24 @@ export default function DisplayMovie({ id }: { id: string }) {
       .single(),
   });
 
+  const moviePostersArray = useFetchData({
+    query: supabase
+      .from("constants")
+      .select("*")
+      .match({
+        id: "movie_posters_array",
+      })
+      .single(),
+  });
+  const movieVideosArray = useFetchData({
+    query: supabase
+      .from("constants")
+      .select("*")
+      .match({
+        id: "movie_videos_array",
+      })
+      .single(),
+  });
   console.log(movieInfo, error);
 
   const movieInfoView = useFetchData({
@@ -363,7 +381,13 @@ export default function DisplayMovie({ id }: { id: string }) {
               Videos and Posters
             </AccordionTrigger>
             <AccordionContent>
-              <p className="font-bold text-lg">Videos</p>
+              <p className="font-bold text-lg">
+                Videos{" "}
+                <span className="text-sm text-red-500 font-normal">
+                  {movieVideosArray?.data?.value_json?.length !=
+                    movieInfo?.movie_videos.length && "(Update Required)"}
+                </span>
+              </p>
               {movieInfo?.movie_videos.map((d) => (
                 <DisplayCard
                   title={d.type}
@@ -373,7 +397,13 @@ export default function DisplayMovie({ id }: { id: string }) {
                 />
               ))}
 
-              <p className="mt-5 font-bold text-lg">Posters</p>
+              <p className="mt-5 font-bold text-lg ink">
+                Posters{" "}
+                <span className="text-sm text-red-500 font-normal">
+                  {moviePostersArray?.data?.value_json?.length !=
+                    movieInfo?.movie_posters.length && "(Update Required)"}
+                </span>
+              </p>
               {movieInfo?.movie_posters.map((d) => (
                 <DisplayPoster d={d} key={d.id} />
               ))}
@@ -390,68 +420,45 @@ export default function DisplayMovie({ id }: { id: string }) {
                   open={editVideos}
                   movie_id={movieInfo.id}
                   defaultValues={{
-                    movie_videos:
-                      movieInfo.movie_videos.length < 3
-                        ? [
-                            ...movieInfo.movie_videos.map((d) => {
-                              return {
-                                content: JSON.stringify(d.content),
-                                type: d.type,
-                                provider: {
-                                  label: d.video_providers.name,
-                                  value: d.video_providers.id,
-                                },
-                                _id: d.id,
-                              };
-                            }),
-                            {
-                              content: null,
-                              type: "teaser",
-                              provider: null,
-                            },
-                          ]
-                        : movieInfo.movie_videos.map((d) => {
-                            return {
-                              content: JSON.stringify(d.content),
-                              type: d.type,
-                              provider: {
-                                label: d.video_providers.name,
-                                value: d.video_providers.id,
-                              },
-                              _id: d.id,
-                            };
-                          }),
+                    movie_videos: [
+                      ...movieInfo.movie_videos.map((d) => {
+                        return {
+                          content: JSON.stringify(d.content),
+                          type: d.type,
+                          provider: {
+                            label: d.video_providers.name,
+                            value: d.video_providers.id,
+                          },
+                          _id: d.id,
+                        };
+                      }),
+                      ...(movieVideosArray?.data?.value_json
+                        .filter(
+                          (type) =>
+                            !movieInfo.movie_videos.some((d) => d.type === type)
+                        )
+                        .map((type) => ({
+                          content: null,
+                          type,
+                          provider: null,
+                        })) ?? []),
+                    ],
 
-                    movie_posters:
-                      movieInfo.movie_posters.length < 4
-                        ? [
-                            ...movieInfo.movie_posters.map((d) => {
-                              return {
-                                url: d.url,
-                                type: d.type,
-                                _id: d.id,
-                              };
-                            }),
-                            {
-                              url: null,
-                              type: "homebanner-16x5",
-                            },
-                            {
-                              url: null,
-                              type: "playerthumbnail-16x9",
-                            },
-                            {
-                              url: null,
-                              type: "title",
-                            },
-                          ]
-                        : movieInfo.movie_posters.map((d) => {
-                            return {
-                              url: d.url,
-                              type: d.type,
-                              _id: d.id,
-                            };
-                          }),
+                    movie_posters: [
+                      ...movieInfo.movie_posters.map((d) => ({
+                        url: d.url,
+                        type: d.type,
+                        _id: d.id,
+                      })),
+                      ...(moviePostersArray?.data?.value_json
+                        .filter(
+                          (type) =>
+                            !movieInfo.movie_posters.some(
+                              (d) => d.type === type
+                            )
+                        )
+                        .map((type) => ({ url: null, type })) ?? []),
+                    ],
                   }}
                   onClose={() => {
                     refetch();

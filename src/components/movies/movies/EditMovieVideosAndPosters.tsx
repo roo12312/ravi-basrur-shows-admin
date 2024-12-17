@@ -163,7 +163,7 @@ export function EditMovieVideosAndPosters({
   const upsertFile = useUpsertToStorage();
 
   const onSubmitEdit = async (data: movieBasicType) => {
-    console.log(data);
+    console.log({ data });
 
     try {
       await Promise.all(

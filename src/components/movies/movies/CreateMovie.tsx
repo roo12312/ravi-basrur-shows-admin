@@ -156,54 +156,54 @@ export const CreateMovie: React.FC<ProfileFormType> = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const [data, setData] = useState({});
+  const moviePostersArray = useFetchData({
+    query: supabase
+      .from("constants")
+      .select("*")
+      .match({
+        id: "movie_posters_array",
+      })
+      .single(),
+  });
+  const movieVideosArray = useFetchData({
+    query: supabase
+      .from("constants")
+      .select("*")
+      .match({
+        id: "movie_videos_array",
+      })
+      .single(),
+  });
 
-  const defaultValues = {
-    movie_cast: [
-      {
-        cast_ids: [""],
-        role_id: "",
-      },
-    ],
-    movie_videos: [
-      {
-        content: null,
-        type: "movie",
-        provider: null,
-      },
-      {
-        content: null,
-        type: "trailer",
-        provider: null,
-      },
-      {
-        content: null,
-        type: "teaser",
-        provider: null,
-      },
-    ],
-    movie_posters: [
-      {
-        url: null,
-        type: "poster-150x200",
-      },
-      {
-        url: null,
-        type: "homebanner-16x5",
-      },
-      {
-        url: null,
-        type: "playerthumbnail-16x9",
-      },
-      {
-        url: null,
-        type: "title",
-      },
-    ],
-  };
+  useEffect(() => {
+    const defaultValues = {
+      movie_cast: [
+        {
+          cast_ids: [""],
+          role_id: "",
+        },
+      ],
+      movie_videos: [
+        ...(movieVideosArray?.data?.value_json.map((type) => ({
+          content: null,
+          type,
+          provider: null,
+        })) ?? []),
+      ],
+      movie_posters: [
+        ...(moviePostersArray?.data?.value_json.map((type) => ({
+          url: null,
+          type,
+        })) ?? []),
+      ],
+    };
+
+    form.reset(defaultValues);
+  }, [movieVideosArray?.data, moviePostersArray?.data]);
 
   const form = useForm<CompleteMovie>({
     resolver: zodResolver(CompleteMovieSchema),
-    defaultValues,
+
     mode: "onChange",
   });
 
