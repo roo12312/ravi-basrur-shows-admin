@@ -125,6 +125,12 @@ const NAV_ITEMS: NavItem[] = [
     icon: "bell",
     label: "Push Notifications",
   },
+  {
+    title: "Popups",
+    href: "/dashboard/popups",
+    icon: "maximize",
+    label: "Popups",
+  },
 ];
 
 export function DashboardNav({

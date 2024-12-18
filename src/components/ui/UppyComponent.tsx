@@ -68,7 +68,7 @@ export default function UppyComponent({
         .on("complete", (result) => {
           const uploadedFile = result.successful[0];
 
-          console.log({ uploadedFile });
+          console.log({ uploadedFile, field });
           field.onChange(uploadedFile);
         })
         .on("file-editor:complete", (updatedFile) => {

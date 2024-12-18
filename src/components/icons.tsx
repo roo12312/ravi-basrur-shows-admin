@@ -40,6 +40,7 @@ import {
   IndianRupee,
   TicketIcon,
   CircleDollarSign,
+  Maximize,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -80,6 +81,7 @@ export const Icons = {
   "panel-bottom-dashed": PanelBottom,
   bell: Bell,
   "indian-rupee": IndianRupee,
+  maximize: Maximize,
   ticket: TicketIcon,
   "circle-dollar-sign": CircleDollarSign,
   gitHub: ({ ...props }: LucideProps) => (
