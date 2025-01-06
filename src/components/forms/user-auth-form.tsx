@@ -48,7 +48,7 @@ export default function UserAuthForm() {
         password: data.password,
       });
       console.log("rsp ", rsp);
-      if (rsp.data) {
+      if (!rsp.error) {
         router.replace("/dashboard");
       } else {
         setError("Invalid email or password");
@@ -65,7 +65,6 @@ export default function UserAuthForm() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-2 w-full"
         >
-          {error && <div className="text-red-500">{error}</div>}
           <FormField
             control={form.control}
             name="email"
@@ -102,7 +101,7 @@ export default function UserAuthForm() {
               </FormItem>
             )}
           />
-
+          {error && <div className="text-red-500 text-sm">{error}</div>}
           <Button disabled={loading} className="ml-auto w-full" type="submit">
             Login
           </Button>
