@@ -37,16 +37,24 @@ export default function UserAuthForm() {
 
   const loading = form.formState.isSubmitting;
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: UserFormValue) => {
-    console.log(data);
-    const rsp = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-    console.log("rsp ", rsp);
-    if (rsp.data) {
-      router.replace("/dashboard");
+    setError(null); // Reset error state
+    try {
+      console.log(data);
+      const rsp = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      console.log("rsp ", rsp);
+      if (rsp.data) {
+        router.replace("/dashboard");
+      } else {
+        setError("Invalid email or password");
+      }
+    } catch (err) {
+      setError("An error occurred during sign-in");
     }
   };
 
@@ -57,6 +65,7 @@ export default function UserAuthForm() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-2 w-full"
         >
+          {error && <div className="text-red-500">{error}</div>}
           <FormField
             control={form.control}
             name="email"
