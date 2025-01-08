@@ -82,13 +82,26 @@ export const columns: ColumnDef<Tables<"coupons">>[] = [
       <DataTableColumnHeader column={column} title="Valid Until" />
     ),
     cell: ({ getValue }) => {
-      return new Date(getValue() as string).toLocaleTimeString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      const valid = new Date(getValue() as string) < new Date();
+      return (
+        <>
+          <p>
+            {new Date(getValue() as string).toLocaleTimeString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+          <Badge
+            variant={!valid ? "destructive" : "success"} // Use green if draft is true, yellow otherwise
+            className="text-sm"
+          >
+            {!valid ? "Expired" : "Valid"}
+          </Badge>
+        </>
+      );
     },
   },
   {
