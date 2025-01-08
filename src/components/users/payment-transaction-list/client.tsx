@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { columns } from "./columns";
 import { Tables } from "@/types/database.types";
+import { filterNullKeys } from "@/lib/commonFunctions";
 
 interface Props {
   user_id: "string";
@@ -25,7 +26,10 @@ interface DataTableFilterField<TData> {
   options?: Option[];
 }
 
-export const PaymentTransactionsList: React.FC<Props> = ({ user_id }) => {
+export const PaymentTransactionsList: React.FC<Props> = ({
+  user_id,
+  movie_id,
+}) => {
   const router = useRouter();
   const pathName = usePathname();
 
@@ -70,7 +74,7 @@ export const PaymentTransactionsList: React.FC<Props> = ({ user_id }) => {
         filterFields={filterFields}
         columns={columns}
         tableName="payment_transactions"
-        initialFixedFilter={{ user_id: user_id }}
+        initialFixedFilter={filterNullKeys({ user_id, movie_id })}
         select="*,movies!inner(*)"
         initalColumnVisiblity={{ updated_at: false }}
       />

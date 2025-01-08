@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ViewingHistoryList } from "@/components/users/viewing-history-list/client";
 import { toast } from "sonner";
 import { PayoutTransactionList } from "@/components/users/payout-transaction-list/client";
+import { PaymentTransactionsList } from "@/components/users/payment-transaction-list/client";
 
 function combineCastInformation(data) {
   const roleMap = {};
@@ -213,7 +214,7 @@ export default function DisplayMovie({ id }: { id: string }) {
               )}
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-6">
+          <AccordionItem value="item-2">
             <AccordionTrigger className="text-xl font-bold">
               Published Status
             </AccordionTrigger>
@@ -262,7 +263,7 @@ export default function DisplayMovie({ id }: { id: string }) {
               </Button>
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-2">
+          <AccordionItem value="item-3">
             <AccordionTrigger className="text-xl font-bold">
               Movie Cast
             </AccordionTrigger>
@@ -318,7 +319,7 @@ export default function DisplayMovie({ id }: { id: string }) {
               )}
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-3">
+          <AccordionItem value="item-4">
             <AccordionTrigger className="text-xl font-bold">
               Release Details & Pricing
             </AccordionTrigger>
@@ -376,7 +377,7 @@ export default function DisplayMovie({ id }: { id: string }) {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-4">
+          <AccordionItem value="item-5">
             <AccordionTrigger className="text-xl font-bold">
               Videos and Posters
             </AccordionTrigger>
@@ -469,7 +470,7 @@ export default function DisplayMovie({ id }: { id: string }) {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-5">
+          <AccordionItem value="item-6">
             <AccordionTrigger className="text-xl font-bold">
               Movie Viewing Histroy
             </AccordionTrigger>
@@ -477,12 +478,20 @@ export default function DisplayMovie({ id }: { id: string }) {
               <ViewingHistoryList movie_id={movieInfo?.id} />
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-6">
+          <AccordionItem value="item-7">
             <AccordionTrigger className="text-xl font-bold">
               Payout Histroy
             </AccordionTrigger>
             <AccordionContent>
               <PayoutTransactionList movie_id={movieInfo?.id} />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-8">
+            <AccordionTrigger className="text-xl font-bold">
+              Payment Histroy
+            </AccordionTrigger>
+            <AccordionContent>
+              <PaymentTransactionsList movie_id={movieInfo?.id} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

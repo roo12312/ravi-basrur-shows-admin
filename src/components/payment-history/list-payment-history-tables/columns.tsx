@@ -112,9 +112,10 @@ export const columns: ColumnDef<Tables<"payment_transactions">>[] = [
     header: "Coupon",
     cell: ({ row, getValue }) =>
       row.getValue("response")?.coupon
-        ? row.getValue("response")?.coupon?.coupon_amount ??
-          "" + " " + row.getValue("response")?.coupon?.coupon_code ??
-          ""
+        ? row.getValue("response")?.coupon?.coupon_amount +
+          " (" +
+          row.getValue("response")?.coupon?.coupon +
+          ")"
         : null,
   },
   {
