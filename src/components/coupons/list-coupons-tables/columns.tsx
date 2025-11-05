@@ -82,7 +82,7 @@ export const columns: ColumnDef<Tables<"coupons">>[] = [
       <DataTableColumnHeader column={column} title="Valid Until" />
     ),
     cell: ({ getValue }) => {
-      const valid = new Date(getValue() as string) < new Date();
+      const valid = new Date(getValue() as string) > new Date();
       return (
         <>
           <p>
